@@ -1,7 +1,5 @@
-import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import User from '../database/models/User.js';
+import User from '../models/User.js';
 
 
 export const findExistingUser = async (property, value) => {
@@ -10,8 +8,6 @@ export const findExistingUser = async (property, value) => {
     });
 
 }
-
-
 
 export const createNewUser = async (data) => {
     const { email, password, fullname } = data;
@@ -28,4 +24,5 @@ export const createNewUser = async (data) => {
     }
     );
 }
+
 
