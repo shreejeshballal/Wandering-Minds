@@ -40,7 +40,7 @@ export const loginUser = async (req, res, next) => {
         if (!isPasswordValid)
             throw new CustomError("Invalid password", 400);
 
-        const { accessToken, refreshToken } = await generateTokens(
+        const { accessToken, refreshToken } = generateTokens(
             user._id
         );
 

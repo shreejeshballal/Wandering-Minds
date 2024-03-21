@@ -5,10 +5,10 @@ import { Navigate } from "react-router-dom";
 const AuthRedirect = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
 
-  return !isNullOrUndefined(user) ? (
-    children
-  ) : (
+  return isNullOrUndefined(user) ? (
     <Navigate to="/auth/login" replace={true} />
+  ) : (
+    children
   );
 };
 

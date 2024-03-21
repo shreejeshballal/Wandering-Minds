@@ -25,3 +25,7 @@ export const isEmpty = (value: any): boolean => {
   }
   return false;
 };
+
+export const checkEmptyfields = (fields: any) => {
+  return fields.some((field: any) => isEmpty(field.value));
+};

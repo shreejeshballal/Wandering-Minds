@@ -5,6 +5,7 @@ import { generateTokens, isTokenExpired } from "../utils/utils.js";
 import { findExistingUser } from "../services/user-service.js";
 
 export const authMiddleware = (req, res, next) => {
+    console.log("Auth middleware");
 
     try {
         const accessToken = req.cookies.access;
@@ -16,7 +17,6 @@ export const authMiddleware = (req, res, next) => {
             });
         } else {
             const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, { ignoreExpiration: true });
-            console.log("Decoded", decoded);
             if (!findExistingUser("id", decoded.id)) {
                 return res.status(401).json({
                     status: "Error",
@@ -25,7 +25,9 @@ export const authMiddleware = (req, res, next) => {
             }
 
             if (isTokenExpired(decoded.exp)) {
+
                 const refreshToken = req.cookies.refresh;
+
                 jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
                     if (err) {
                         console.log("Refresh token invalid", err.message);
@@ -34,7 +36,6 @@ export const authMiddleware = (req, res, next) => {
                             message: "Invalid refresh token",
                         });
                     } else {
-                        console.log("User", user);
                         const tokens = generateTokens(user.id);
                         console.log("New access token", tokens.accessToken);
                         console.log("New refresh token", tokens.refreshToken);
@@ -50,13 +51,14 @@ export const authMiddleware = (req, res, next) => {
                             secure: true,
                             maxAge: 24 * 60 * 60 * 30 * 1000,
                         });
-                        next();
+
                     }
 
                 });
-            } else {
-                next();
             }
+
+            req.user = decoded.id;
+            next();
         }
     } catch (err) {
         console.log(err.message);

@@ -6,6 +6,8 @@ import { Register } from "./pages/auth/Register";
 import { AuthContextProvider } from "./context/AuthContext";
 import { Toaster } from "./components/ui/sonner";
 import AuthRedirect from "./components/custom/AuthRedirect";
+import Editor from "./pages/editor/Editor";
+import { EditorContextProvider } from "./context/EditorContext";
 function App() {
   const routes = [
     {
@@ -21,21 +23,13 @@ function App() {
       element: <Register />,
     },
     {
-      path: "/",
-      element: <Home />,
-    },
-
-    {
-      path: "/about",
+      path: "/editor",
       element: (
         <AuthRedirect>
-          <div className="bg-ascent-100 h-screen w-full text-7xl">
-            About Found
-          </div>
+          <Editor />
         </AuthRedirect>
       ),
     },
-
     {
       path: "*",
       element: <div className="bg-black h-screen w-full">Not Found</div>,
@@ -45,15 +39,17 @@ function App() {
   return (
     <BrowserRouter>
       <AuthContextProvider>
-        <Navbar />
+        <EditorContextProvider>
+          <Navbar />
 
-        <Routes>
-          {routes.map((route) => (
-            <Route {...route} />
-          ))}
-        </Routes>
+          <Routes>
+            {routes.map((route) => (
+              <Route {...route} />
+            ))}
+          </Routes>
+        </EditorContextProvider>
       </AuthContextProvider>
-      <Toaster />
+      <Toaster richColors />
     </BrowserRouter>
   );
 }

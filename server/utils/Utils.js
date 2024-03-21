@@ -29,6 +29,7 @@ export const generateTokens = (userId) => {
 
 
 export const isTokenExpired = (exp) => {
+
     return Date.now() / 1000 > exp;
 }
 
