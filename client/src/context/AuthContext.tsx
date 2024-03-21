@@ -77,8 +77,6 @@ export const AuthContextProvider = ({ children }: { children?: ReactNode }) => {
       if (response) {
         toast.success("Welcome back!");
         setUser(response.result.user);
-      } else {
-        setUser(null);
       }
     } else {
       logout();

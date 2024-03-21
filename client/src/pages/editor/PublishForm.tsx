@@ -5,6 +5,7 @@ import { LoadingSpinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { useEditor } from "@/context/EditorContext";
 import useApi from "@/hooks/useApi";
+import { useNavigateHook } from "@/hooks/useNavigationHook";
 import Layout from "@/layout/Layout";
 import { useState } from "react";
 import { IoMdClose } from "react-icons/io";
@@ -19,7 +20,7 @@ interface ContentObject {
 const PublishForm = () => {
   const { blog, setEditorState, setBlog } = useEditor();
   const { makeRequest, uploadImageToS3 } = useApi();
-
+  const { navigateTo } = useNavigateHook();
   const [loading, setLoading] = useState(false);
   const [tag, setTag] = useState<string>("");
 
@@ -53,7 +54,7 @@ const PublishForm = () => {
     }
   };
 
-  const handlePublish = async () => {
+  const handlePublishOrDefault = async (property: string) => {
     if (blog.title.length <= 0) {
       return toast.error("Title is required");
     }
@@ -67,6 +68,7 @@ const PublishForm = () => {
     let finalBlogObject = blog;
     setLoading(true);
     const bannerUrl = await uploadImageToS3(blog.banner);
+
     finalBlogObject = { ...finalBlogObject, banner: bannerUrl };
 
     const newContentArray: Array<ContentObject> = (
@@ -79,6 +81,7 @@ const PublishForm = () => {
       }
       return content;
     });
+
     finalBlogObject = {
       ...finalBlogObject,
       content: newContentArray,
@@ -86,14 +89,25 @@ const PublishForm = () => {
 
     const response = await makeRequest("post", "/create-blog", {
       ...finalBlogObject,
-      draft: false,
+      draft: property === "draft" ? true : false,
     });
 
     if (response) {
-      toast.success("Blog published successfully");
+      toast.success(
+        `Blog ${property === "draft" ? "saved" : "published successfully"}`
+      );
+      setBlog({
+        banner: "",
+        title: "",
+        content: [],
+        tags: [],
+        des: "",
+        author: "",
+      });
       setEditorState("editor");
+      navigateTo("/");
     }
-    
+
     setLoading(false);
   };
 
@@ -106,8 +120,8 @@ const PublishForm = () => {
           onClick={() => setEditorState("editor")}
         />
       </header>
-      <div className="flex flex-col md:flex-row gap-5 my-5">
-        <article className="flex flex-col gap-3 min-w-[50%]">
+      <div className="flex flex-col md:flex-row  my-5 justify-between">
+        <article className="flex flex-col gap-3 w-[48%]">
           <div className="aspect-video w-full  rounded-lg overflow-hidden">
             <img
               src={blog.banner}
@@ -116,9 +130,11 @@ const PublishForm = () => {
             />
           </div>
           <h2 className="font-medium text-3xl ">{blog.title}</h2>
-          <p className="text-grey-800 break-words">{blog.des}</p>
+          <p className="text-grey-800 break-words ">
+            {blog.des === "" ? "Add Description" : blog.des}
+          </p>
         </article>
-        <article className="flex gap-5 flex-col w-full ">
+        <article className="flex gap-5 flex-col w-[48%] ">
           <div>
             <h5 className="font-normal text-base text-grey-500  ">Title</h5>
             <p className="bg-grey-100 text-grey-700 text-base mt-1 p-3 rounded-md">
@@ -130,14 +146,13 @@ const PublishForm = () => {
               Description
             </h5>
             <Textarea
+              placeholder="Add description"
               maxLength={200}
-              className="bg-grey-100 text-grey-700 text-base mt-1 p-3 rounded-md resize-none"
+              className="bg-grey-100 text-grey-700 text-base mt-1 p-3  rounded-md resize-none"
               rows={5}
               value={blog.des}
               onChange={(e) => handleInputChange(e, "des")}
-            >
-              {blog.title}
-            </Textarea>
+            />
             <p className="float-right text-xs mt-1 text-grey-600">
               {blog.des.length} / 200
             </p>
@@ -180,11 +195,15 @@ const PublishForm = () => {
         <Button
           variant="default"
           className=" rounded-full  px-5 mb-10"
-          onClick={handlePublish}
+          onClick={() => handlePublishOrDefault("publish")}
         >
           Publish{loading && <LoadingSpinner className="ml-2" />}
         </Button>
-        <Button variant="secondary" className="rounded-full  px-5 mb-10">
+        <Button
+          variant="secondary"
+          className="rounded-full  px-5 mb-10"
+          onClick={() => handlePublishOrDefault("draft")}
+        >
           Draft{loading && <LoadingSpinner className="ml-2" />}
         </Button>
       </div>

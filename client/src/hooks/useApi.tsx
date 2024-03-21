@@ -28,7 +28,7 @@ const useApi = () => {
       return response.data;
     } catch (error: any) {
       console.error(error);
-      toast.error(error?.response.data.message || error.message);
+      toast.error(error?.response?.data?.message || error.message);
     } finally {
       setApiLoading(false);
     }
