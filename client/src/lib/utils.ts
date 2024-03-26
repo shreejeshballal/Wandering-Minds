@@ -29,3 +29,13 @@ export const isEmpty = (value: any): boolean => {
 export const checkEmptyfields = (fields: any) => {
   return fields.some((field: any) => isEmpty(field.value));
 };
+
+export const formatDate = (date: string) => {
+  const d = new Date(date);
+
+  const month = d.toLocaleString("default", { month: "short" });
+  const day = d.getDate();
+  const year = d.getFullYear();
+
+  return `${day} ${month}, ${year}`;
+};
