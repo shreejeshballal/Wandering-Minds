@@ -1,15 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { LoadingSpinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { useEditor } from "@/context/EditorContext";
 import useApi from "@/hooks/useApi";
 import { useNavigateHook } from "@/hooks/useNavigationHook";
 import Layout from "@/layout/Layout";
+import { categories } from "@/lib/constants";
 import { useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ContentObject {
   optionType: string;
@@ -22,13 +29,10 @@ const PublishForm = () => {
   const { makeRequest, uploadImageToS3 } = useApi();
   const { navigateTo } = useNavigateHook();
   const [loading, setLoading] = useState(false);
-  const [tag, setTag] = useState<string>("");
 
   const handleInputChange = (e: any, property: string) => {
     if (property === "des") {
       setBlog({ ...blog, des: e.target.value });
-    } else if (property === "tags") {
-      setTag(e.target.value);
     }
   };
 
@@ -38,20 +42,17 @@ const PublishForm = () => {
     setBlog({ ...blog, tags: newTags });
   };
 
-  const handleAddTag = (e: any) => {
-    if (e.key === "Enter") {
-      if (blog.tags.length >= 8) {
-        toast.warning("You can only add 8 tags");
-        return;
-      }
-      const newTag = tag.trim().toLowerCase();
-      if (blog.tags.includes(newTag)) {
-        toast.warning("Tag already exists");
-        return;
-      }
-      setBlog({ ...blog, tags: [...blog.tags, newTag] });
-      setTag("");
+  const handleAddTag = (value: string) => {
+    if (blog.tags.length >= 8) {
+      toast.warning("You can only add 8 tags");
+      return;
     }
+    const newTag = value.toLowerCase();
+    if (blog.tags.includes(newTag)) {
+      toast.warning("Tag already exists");
+      return;
+    }
+    setBlog({ ...blog, tags: [...blog.tags, newTag] });
   };
 
   const handlePublishOrDefault = async (property: string) => {
@@ -61,8 +62,8 @@ const PublishForm = () => {
     if (blog.des.length <= 0) {
       return toast.error("Description is required");
     }
-    if (blog.tags.length < 3) {
-      return toast.error("Minimum 3 tags are required");
+    if (blog.tags.length < 1) {
+      return toast.error("Minimum 1 tag is required");
     }
 
     let finalBlogObject = blog;
@@ -82,9 +83,13 @@ const PublishForm = () => {
       return content;
     });
 
+    const filteredContentArray = newContentArray.filter((content) => {
+      content.value === "";
+    });
+
     finalBlogObject = {
       ...finalBlogObject,
-      content: newContentArray,
+      content: filteredContentArray,
     };
 
     const response = await makeRequest("post", "/create-blog", {
@@ -110,6 +115,9 @@ const PublishForm = () => {
 
     setLoading(false);
   };
+
+  const newCategories = categories.filter((category) => category !== "All");
+  newCategories.push("Other");
 
   return (
     <Layout>
@@ -161,15 +169,21 @@ const PublishForm = () => {
             <h5 className="font-normal text-base text-grey-500  ">
               Tags (Helps in ranking and searching)
             </h5>
-            <div className="bg-grey-100 text-grey-700 h-ful text-base mt-1 p-3 pb-6 rounded-md">
-              <Input
-                placeholder="Add tags"
-                maxLength={20}
-                className="py-3 h-10 resize-none outline-none  border-none text-grey-700"
-                onChange={(e) => handleInputChange(e, "tags")}
-                onKeyDown={(e) => handleAddTag(e)}
-                value={tag}
-              />
+            <div className="bg-grey-100 text-grey-700 h-ful text-base mt-1 p-3 pb-6 rounded-md ">
+              <Select
+                onValueChange={(value: string) => handleAddTag(value)}
+                value=""
+              >
+                <SelectTrigger className="w-full ring-0 outline-none">
+                  <SelectValue placeholder="Select tags" />
+                </SelectTrigger>
+                <SelectContent>
+                  {newCategories.map((category) => {
+                    return <SelectItem value={category}>{category}</SelectItem>;
+                  })}
+                </SelectContent>
+              </Select>
+
               <div className="flex flex-wrap gap-2 mt-3">
                 {blog.tags.map((tag, index) => {
                   return (

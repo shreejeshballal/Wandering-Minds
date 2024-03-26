@@ -50,7 +50,7 @@ const Fields = ({ item, index }: Props) => {
       }
       const file = e.target.files[0];
       const reader = new FileReader();
-      reader.onloadend = () => {
+      reader.onload = () => {
         const newBlogContentArray = [...blog.content];
         newBlogContentArray[index] = {
           ...newBlogContentArray[index],
@@ -88,7 +88,7 @@ const Fields = ({ item, index }: Props) => {
         placeholder="Type your paragraph"
         value={item.value}
         onChange={(e) => handleChange(e, "content")}
-        className="min-h-[15rem] font-normal resize-none m-0 text-base  focus:bg-grey-200 p-3 smooth-transition bg-grey-100 bg-opacity-50 "
+        className="min-h-[10rem] font-normal resize-none m-0 text-base  focus:bg-grey-200 p-3 smooth-transition bg-grey-100 bg-opacity-50"
       />
     ),
     image: (
