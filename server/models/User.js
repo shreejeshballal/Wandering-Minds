@@ -79,7 +79,7 @@ const userSchema = mongoose.Schema({
     },
     blogs: {
         type: [Schema.Types.ObjectId],
-        ref: 'blogs',
+        ref: 'Blog',
         default: [],
     },
     timestamps: {
@@ -88,5 +88,5 @@ const userSchema = mongoose.Schema({
 
 })
 
-
-export default mongoose.models.User || mongoose.model("User", userSchema);
+const User = mongoose.models.User || mongoose.model("User", userSchema);
+export default User;
