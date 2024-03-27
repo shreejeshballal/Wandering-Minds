@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getImageUrl } from "@/lib/utils";
 
 interface ContentObject {
   optionType: string;
@@ -115,6 +116,7 @@ const PublishForm = () => {
 
     setLoading(false);
   };
+  console.log(blog);
 
   const newCategories = categories.filter((category) => category !== "All");
   newCategories.push("Other");
@@ -132,7 +134,7 @@ const PublishForm = () => {
         <article className="flex flex-col gap-3 w-[48%]">
           <div className="aspect-video w-full  rounded-lg overflow-hidden">
             <img
-              src={blog.banner}
+              src={getImageUrl(blog.banner)}
               alt="banner"
               className="aspect-video object-cover h-full w-full"
             />
@@ -178,8 +180,12 @@ const PublishForm = () => {
                   <SelectValue placeholder="Select tags" />
                 </SelectTrigger>
                 <SelectContent>
-                  {newCategories.map((category) => {
-                    return <SelectItem value={category}>{category}</SelectItem>;
+                  {newCategories.map((category, index) => {
+                    return (
+                      <SelectItem key={index} value={category}>
+                        {category}
+                      </SelectItem>
+                    );
                   })}
                 </SelectContent>
               </Select>

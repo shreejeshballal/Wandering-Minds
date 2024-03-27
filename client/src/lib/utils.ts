@@ -11,6 +11,9 @@ export const isNullOrUndefined = (value: any): value is null | undefined => {
 };
 
 export const isEmpty = (value: any): boolean => {
+  if (value instanceof File) {
+    return value.size === 0;
+  }
   if (isNullOrUndefined(value)) {
     return true;
   }
@@ -21,8 +24,10 @@ export const isEmpty = (value: any): boolean => {
     return value.length === 0;
   }
   if (typeof value === "object") {
+    console.log(Object.keys(value).length === 0);
     return Object.keys(value).length === 0;
   }
+
   return false;
 };
 
@@ -35,7 +40,13 @@ export const formatDate = (date: string) => {
 
   const month = d.toLocaleString("default", { month: "short" });
   const day = d.getDate();
-  const year = d.getFullYear();
+  // let year = d.getFullYear();
+  // year = year.toString().slice(2, 4);
 
-  return `${day} ${month}, ${year}`;
+  return `${day} ${month}`;
+};
+
+export const getImageUrl = (file: any) => {
+  const url = URL.createObjectURL(file);
+  return url;
 };

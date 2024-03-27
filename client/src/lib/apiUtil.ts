@@ -15,8 +15,4 @@ const api = axios.create({
 
 export default api;
 
-export const awsApi = axios.create({
-  headers: {
-    "Content-Type": "multipart/form-data",
-  },
-});
+export const awsApi = axios.create();
