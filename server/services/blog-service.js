@@ -45,3 +45,13 @@ export const fetchBlogs = async (type, category, page) => {
         }
     }
 }
+
+export const countBlogs = async (type, category) => {
+    switch (type) {
+        case "latest": {
+            const catQuery = category ? { tags: { $in: [category] } } : null
+            const count = await Blog.countDocuments({ draft: false, ...catQuery });
+            return count;
+        }
+    }
+}
