@@ -32,4 +32,13 @@
   .smooth-transition {
     @apply transition-all duration-300;
   }
+
+  *::-webkit-scrollbar {
+    /* background: rgb(83, 83, 83); */
+    width: 0.4rem;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: rgb(210, 210, 210);
+    border-radius: 10rem !important;
+  }
 }
