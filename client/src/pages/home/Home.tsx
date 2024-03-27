@@ -58,7 +58,7 @@ export const Home = () => {
             {loading.type === "initial" && loading.loading === true ? (
               <BlogPostCardSkeleton />
             ) : latestBlogs && latestBlogs.length === 0 ? (
-              <div className="text-center">No blogs</div>
+              <div className="text-center mt-10">No blogs found!</div>
             ) : (
               latestBlogs.map((data: BlogPostProps, index: number) => (
                 <BlogPostCard key={index} data={data} />
@@ -110,7 +110,7 @@ export const Home = () => {
               {loading.type === "initial" && loading.loading === true ? (
                 <UserCardSkeleton />
               ) : trendingBlogs && trendingBlogs.length === 0 ? (
-                <div className="text-center">No trending blogs</div>
+                <div className="text-center mt-10">No trending blogs!</div>
               ) : (
                 trendingBlogs.map((data: TrendingBlog, index: number) => (
                   <TrendingCard data={data} key={index} index={index} />
