@@ -36,13 +36,15 @@ const useApi = () => {
 
   const uploadImageToS3 = async (file: any) => {
     try {
-      const { uploadURL } = await makeRequest("get", "/get-upload-url");
+      const { uploadURL } = await makeRequest("post", "/get-upload-url", {
+        contentType: file.type,
+      });
       if (uploadURL) {
         await makeRequest("put", uploadURL, file, "aws");
       }
       return uploadURL.split("?")[0];
     } catch (error: any) {
-      toast.error(error?.response.data.message || error.message);
+      toast.error(error?.response?.data?.message || error.message);
     }
   };
 

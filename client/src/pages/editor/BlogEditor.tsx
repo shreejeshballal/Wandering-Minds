@@ -9,6 +9,8 @@ import TextEditor from "./FieldAdder";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useRef } from "react";
+import { imageFileTypes } from "@/lib/constants";
+import { getImageUrl } from "@/lib/utils";
 
 interface BlogContentItem {
   optionType: string;
@@ -42,12 +44,12 @@ const BlogEditor = () => {
         toast.error("No file selected");
         return;
       }
+      if (!imageFileTypes.includes(e.target.files[0].type)) {
+        toast.error("Invalid file type");
+        return;
+      }
       const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setBlog({ ...blog, banner: reader.result as string });
-      };
-      reader.readAsDataURL(file);
+      setBlog({ ...blog, banner: file });
     } else if (property === "title") {
       setBlog({ ...blog, title: e.target.value });
     }
@@ -65,13 +67,13 @@ const BlogEditor = () => {
               </p>
             ) : (
               <img
-                src={blog.banner}
+                src={getImageUrl(blog.banner)}
                 className=" aspect-video object-cover w-full h-full"
               />
             )}
             <Input
               type="file"
-              accept=".png,.jpg,.jpeg"
+              accept={imageFileTypes.join(",")}
               className="opacity-0 absolute h-full w-full"
               onChange={(e) => handleInputFieldChange(e, "banner")}
             />
