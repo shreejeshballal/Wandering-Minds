@@ -8,6 +8,7 @@ import { Toaster } from "./components/ui/sonner";
 import AuthRedirect from "./components/custom/AuthRedirect";
 import Editor from "./pages/editor/Editor";
 import { EditorContextProvider } from "./context/EditorContext";
+import Search from "./pages/search/Search";
 import Error from "./components/custom/Error";
 function App() {
   const routes = [
@@ -30,6 +31,10 @@ function App() {
           <Editor />
         </AuthRedirect>
       ),
+    },
+    {
+      path: "/search",
+      element: <Search />,
     },
     {
       path: "*",

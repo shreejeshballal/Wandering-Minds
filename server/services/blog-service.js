@@ -4,54 +4,64 @@ import Blog from "../models/Blog.js";
 export const createNewBlog = async (data) => {
     const newBlog = await Blog.create(data);
     await User.findByIdAndUpdate(data.author, {
-        $push: { blogs: newBlog._id }
+        $push: { blogs: newBlog._id },
     });
     return newBlog;
-}
+};
 
 export const incrementBlogCount = async (author) => {
     await User.findByIdAndUpdate(author, {
-        $inc: { "account_info.total_posts": 1 }
+        $inc: { "account_info.total_posts": 1 },
     });
-
-}
-export const fetchBlogs = async (type, category, page) => {
-
+};
+export const fetchBlogs = async (type, category, skip) => {
     switch (type) {
         case "latest": {
-            const catQuery = category ? { tags: { $in: [category] } } : null
-            const latestBlogs = await Blog.find(
-                { draft: false, ...catQuery }
-            )
-                .populate("author", "personal_info.profile_img personal_info.username  -_id")
+            const catQuery = category ? { tags: { $in: [category] } } : null;
+            const latestBlogs = await Blog.find({ draft: false, ...catQuery })
+                .populate(
+                    "author",
+                    "personal_info.profile_img personal_info.username  -_id"
+                )
                 .sort({ createdAt: -1 })
                 .select("_id title des banner activity tags createdAt")
-                .skip((page - 1) * 10)
-                .limit(10)
+                .skip(skip)
+                .limit(10);
 
             return latestBlogs;
         }
         case "trending": {
-            const catQuery = category ? { tags: { $in: [category] } } : null
-            const trendingBlogs = await Blog.find(
-                { draft: false, ...catQuery }
-            )
-                .populate("author", "personal_info.profile_img personal_info.username -_id")
-                .sort({ total_reads: -1, total_likes: -1, createdAt: -1, })
+            const catQuery = category ? { tags: { $in: [category] } } : null;
+            const trendingBlogs = await Blog.find({ draft: false, ...catQuery })
+                .populate(
+                    "author",
+                    "personal_info.profile_img personal_info.username -_id"
+                )
+                .sort({ total_reads: -1, total_likes: -1, createdAt: -1 })
                 .select("_id title  createdAt")
-                .limit(5)
+                .limit(5);
 
             return trendingBlogs;
         }
     }
-}
+};
 
 export const countBlogs = async (type, category) => {
     switch (type) {
         case "latest": {
-            const catQuery = category ? { tags: { $in: [category] } } : null
+            const catQuery = category ? { tags: { $in: [category] } } : null;
             const count = await Blog.countDocuments({ draft: false, ...catQuery });
             return count;
         }
     }
-}
+};
+
+export const findBlogs = async (query) => {
+    const blogs = await Blog.find({
+        title: { $regex: new RegExp(query, "i") },
+    }).populate(
+        "author",
+        "personal_info.profile_img personal_info.username  -_id"
+    ).select("_id title des banner activity tags createdAt").limit(50);
+    return blogs;
+};

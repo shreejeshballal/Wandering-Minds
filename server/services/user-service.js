@@ -25,4 +25,13 @@ export const createNewUser = async (data) => {
     );
 }
 
+export const findUsers = async (query) => {
+    const users = await User.find({ "personal_info.username": { $regex: query, $options: "i" } })
+        .select("personal_info.username personal_info.profile_img personal_info.fullname ")
+        .sort({ "activity_info.total_reads": -1 })
+        .limit(50);
+
+    return users;
+}
+
 

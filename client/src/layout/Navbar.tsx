@@ -11,7 +11,7 @@ import { Input } from "../components/ui/input";
 import { IoIosSearch } from "react-icons/io";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { FaRegPenToSquare } from "react-icons/fa6";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { useState } from "react";
 import { checkEmptyfields, cn } from "../lib/utils";
 import { DropdownMenuGroup } from "@radix-ui/react-dropdown-menu";
@@ -26,6 +26,18 @@ export const Navbar = () => {
   const { pathname } = useLocation();
 
   const [showSearchBar, setShowSearchBar] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const query = searchParams.get("q");
+
+  const handleSearch = (value: string) => {
+    if (value && pathname !== "/search") {
+      navigateTo(`/search?q=${value}`);
+      console.log("searching");
+    } else {
+      const newParams = new URLSearchParams({ q: value });
+      setSearchParams(newParams);
+    }
+  };
 
   const { blog, setEditorState, editorState } = useEditor();
   const isEditor = pathname === "/editor";
@@ -63,7 +75,7 @@ export const Navbar = () => {
           ) : (
             <div
               className={cn(
-                "absolute  z-[50] top-[5rem] S px-5  w-full sm:w-fit left-0 mx-auto right-0  sm:static   border-lightgrey border-b-[1px] sm:border-0",
+                "absolute  z-[50] top-[4.5rem] bg-light py-3  px-5  w-full sm:w-fit left-0 mx-auto right-0  sm:static   border-lightgrey border-b-[1px] sm:border-0",
                 showSearchBar ? "block" : "hidden ",
                 "sm:block"
               )}
@@ -72,6 +84,10 @@ export const Navbar = () => {
                 <IoIosSearch className="text-2xl  ml-2 " />
                 <Input
                   placeholder="Search"
+                  onChange={(e) => {
+                    handleSearch(e.target.value);
+                  }}
+                  value={query === null ? "" : query}
                   className="focus-visible:ring-0 focus-visible:ring-offset-0 border-0 bg-transparent   "
                 />
               </div>
@@ -85,7 +101,10 @@ export const Navbar = () => {
               variant="secondary"
               size="icon"
               className=" sm:hidden rounded-full"
-              onClick={() => setShowSearchBar(!showSearchBar)}
+              onClick={() => {
+                setShowSearchBar(!showSearchBar);
+                if (pathname !== "/search") navigateTo("/search");
+              }}
             >
               <IoIosSearch className="text-2xl" />
             </Button>
