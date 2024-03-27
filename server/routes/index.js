@@ -8,10 +8,10 @@ const router = Router();
 
 router.use("/auth", UserRoutes);
 router.use("/", authMiddleware, BlogRoutes)
-router.get("/get-upload-url", authMiddleware, async (req, res, next) => {
-    console.log("Get upload URL");
+router.post("/get-upload-url", authMiddleware, async (req, res, next) => {
+    const contentType = req.body.contentType;
     try {
-        const uploadURL = await generateUploadURL();
+        const uploadURL = await generateUploadURL(contentType);
         res.status(200).json({ uploadURL });
     } catch (error) {
         next(error);
